@@ -68,6 +68,29 @@ nodejs_setup(){
     validate $? "installing dependencies"
 }
 
+java_setup(){
+    
+    dnf module enable maven:3.9 -y &>> $logs_file
+    validate $? "enable maven 3.9"
+
+    dnf install maven java-25-openjdk-devel -y &>> $logs_file
+    validate $? "install java 25"
+
+    alternatives --set java "/usr/lib/jvm/java-25-openjdk/bin/java"
+    validate $? "Setting Java 25 as default Java version"
+
+    echo "export JAVA_HOME=$(dirname $(dirname $(readlink -f /usr/bin/java)))" > /etc/profile.d/java.sh
+    source /etc/profile.d/java.sh
+    echo $JAVA_HOME
+    validate $? "Setting JAVA_HOME for maven"
+
+    mvn clean package &>> $logs_file
+    validate $? "installing dependencies"
+
+    mv target/shipping.jar shipping.jar
+    validate $? "moving shipping.jar file"
+}
+
 systemd_setup(){
     sed -i "s/DOMAIN_NAME/$app_name/g" "$script_dir/$app_name.service"
     cp "$script_dir/$app_name.service" /etc/systemd/system/$app_name.service
