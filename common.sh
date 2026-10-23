@@ -8,6 +8,8 @@ G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
 
+echo "script execution started at $(date +"%F %T")"
+
 check_user(){
     if [ $user_id -ne 0 ]; then
     echo "user $USER is not having sudo access"
@@ -27,7 +29,61 @@ validate(){
     fi
 }
 
-echo "script execution started at $(date +"%F %T")"
+app_setup(){
+    id roboshop &>> $logs_file
+    if [ $? -ne 0 ]; then
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+    validate $? "creating system user"
+    else
+    echo -e "system user is aiready added ${Y}SKIPPING${N}"
+    fi
+
+    rm -rf /app &>> $logs_file
+    validate $? "removing files under app directory"
+
+    mkdir -p /app &>> $logs_file
+    validate $? "creating app directorey"
+
+    curl -L -o /tmp/catalouge.zip https://raw.githubusercontent.com/daws-92s/roboshop-documentation/refs/heads/main/artifacts/catalogue-v4.zip &>>logs_folder
+    validate $? "downloading catalouge"
+
+    cd /app
+    unzip /tmp/catalouge.zip &>> $logs_file
+    validate $? "unzipping catalouge"
+}
+
+nodejs_setup(){
+    dnf module disable nodejs -y &>> $logs_file
+    validate $? "disabiling nodejs"
+
+    dnf module enable nodejs:24 -y &>> $logs_file
+    validate $? "enable nodejs"
+
+    dnf install nodejs -y &>> $logs_file
+    validate $? "installing nodejs"
+
+    npm install &>> $logs_file
+    validate $? "installing dependencies"
+}
+
+systemd_setup(){
+    sed -i "s/DOMAIN_NAME/$domain_name/g" "$script_dir/$app_name.service"
+    cp "$script_dir/$app_name.service" /etc/systemd/system/$app_name.service
+
+    systemctl daemon-reload &>> $logs_file
+    validate $? "reloading demon"
+
+    systemctl enable $app_name &>> $logs_file
+    validate $? "enable $app_name"
+
+    systemctl start $app_name &>> $logs_file
+    validate $? "starting $app_name"
+}
+
+restart(){
+    systemctl restart $app_name &>> $logs_file
+    validate $? "restarting $app_name"
+}
 
 total_time(){
     echo "$(timestamp) [INFO]=====Toatal seconds taken by script $SECONDS=====" | tee -a $logs_file
