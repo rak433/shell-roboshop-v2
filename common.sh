@@ -7,6 +7,8 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
+domain_name="testdevops.sbs"
+script_dir=$(dirname "$(realpath "$0")")
 
 echo "script execution started at $(date +"%F %T")"
 
@@ -35,7 +37,7 @@ app_setup(){
     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
     validate $? "creating system user"
     else
-    echo -e "system user is aiready added ${Y}SKIPPING${N}"
+    echo -e "system user is already added ${Y}SKIPPING${N}"
     fi
 
     rm -rf /app &>> $logs_file
@@ -44,12 +46,12 @@ app_setup(){
     mkdir -p /app &>> $logs_file
     validate $? "creating app directorey"
 
-    curl -L -o /tmp/catalouge.zip https://raw.githubusercontent.com/daws-92s/roboshop-documentation/refs/heads/main/artifacts/catalogue-v4.zip &>>logs_folder
-    validate $? "downloading catalouge"
+    curl -L -o /tmp/$app_name.zip https://raw.githubusercontent.com/daws-92s/roboshop-documentation/refs/heads/main/artifacts/$app_name-v4.zip &>>logs_folder
+    validate $? "downloading $app_name"
 
     cd /app
-    unzip /tmp/catalouge.zip &>> $logs_file
-    validate $? "unzipping catalouge"
+    unzip /tmp/$app_name.zip &>> $logs_file
+    validate $? "unzipping $app_name"
 }
 
 nodejs_setup(){
@@ -67,7 +69,7 @@ nodejs_setup(){
 }
 
 systemd_setup(){
-    sed -i "s/DOMAIN_NAME/$domain_name/g" "$script_dir/$app_name.service"
+    sed -i "s/DOMAIN_NAME/$app_name/g" "$script_dir/$app_name.service"
     cp "$script_dir/$app_name.service" /etc/systemd/system/$app_name.service
 
     systemctl daemon-reload &>> $logs_file
