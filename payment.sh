@@ -5,7 +5,7 @@ source ./common.sh
 check_user
 
 app_setup
-payment_setup
+python_setup
 systemd_setup
 
 restart

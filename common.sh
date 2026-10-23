@@ -91,7 +91,7 @@ java_setup(){
     validate $? "moving shipping.jar file"
 }
 
-payment_setup(){
+python_setup(){
     dnf install python3.14 python3.14-pip -y &>> $logs_file
     validate $? "installing python 3.14"
 
