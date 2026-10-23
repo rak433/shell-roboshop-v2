@@ -2,7 +2,7 @@
 
 source ./common.sh
 check_user
-
+ 
 dnf module disable nginx -y &>>$logs_file
 dnf module enable nginx:1.26 -y &>>$logs_file
 dnf install nginx -y &>>$logs_file
