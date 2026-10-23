@@ -1,4 +1,5 @@
 #!/bin/bash
+app_name=user
 
 source ./common.sh
 check_user
