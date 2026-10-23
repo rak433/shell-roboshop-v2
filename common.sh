@@ -15,6 +15,10 @@ check_user(){
 }
 mkdir -p $logs_folder
 
+timestamp(){
+    date "+%F %T"
+}
+
 validate(){
     if [ $1 -ne 0 ]; then
        echo -e "$2..${R}FAILED${N}" | tee -a $logs_file
