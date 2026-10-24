@@ -103,7 +103,7 @@ python_setup(){
 }
 
 systemd_setup(){
-    sed -i "s/DOMAIN_NAME/$app_name/g" "$script_dir/$app_name.service"
+    sed -i "s/DOMAIN_NAME/$domain_name/g" "$script_dir/$app_name.service"
     cp "$script_dir/$app_name.service" /etc/systemd/system/$app_name.service
 
     systemctl daemon-reload &>> $logs_file
