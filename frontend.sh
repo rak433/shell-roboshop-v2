@@ -20,7 +20,7 @@ cd /usr/share/nginx/html &>> $logs_file
 unzip /tmp/frontend.zip &>> $logs_file
 validate $? "Downloading and unzipping frontend code"
 
-sed -i "s/DOMAIN_NAME/$domain_name/g" "$scripts_dir/roboshop.conf"
+sudo sed -i "s/DOMAIN_NAME/$domain_name/g" "$scripts_dir/roboshop.conf"
 cp "$scripts_dir/roboshop.conf" /etc/nginx/default.d/roboshop.conf
 validate $? "Copied roboshop config"
 
